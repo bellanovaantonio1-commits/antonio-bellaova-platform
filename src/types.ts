@@ -1,0 +1,284 @@
+export enum UserRole {
+  ADMIN = 'admin',
+  CLIENT = 'client',
+  VIP = 'vip',
+  RESELLER = 'reseller',
+  INVESTOR = 'investor',
+  VIEWER = 'viewer'
+}
+
+export enum UserStatus {
+  PENDING = 'pending',
+  APPROVED = 'approved'
+}
+
+export interface User {
+  id: number;
+  email: string;
+  name: string;
+  address: string;
+  role: UserRole;
+  status: UserStatus;
+  language: string;
+  is_vip: number;
+  created_at: string;
+}
+
+export interface Masterpiece {
+  id: number;
+  serial_id: string;
+  title: string;
+  description: string;
+  materials: string;
+  gemstones: string;
+  valuation: number;
+  rarity: string;
+  deposit_pct: number;
+  image_url: string;
+  current_owner_id: number | null;
+  status: 'available' | 'reserved' | 'sold' | 'auction' | 'resell_pending' | 'fractional_open' | 'fractional_full' | 'fractional_resale';
+  blockchain_hash: string;
+  nft_token_id: string | null;
+  created_at: string;
+}
+
+export interface Auction {
+  id: number;
+  masterpiece_id: number;
+  title: string;
+  image_url: string;
+  description: string;
+  start_price: number;
+  current_bid: number;
+  highest_bidder_id: number | null;
+  end_time: string;
+  status: 'active' | 'ended';
+  vip_only: number;
+  terms?: string;
+}
+
+export interface Payment {
+  id: number;
+  user_id: number;
+  masterpiece_id: number;
+  type: 'deposit' | 'full';
+  amount: number;
+  status: 'pending' | 'paid' | 'rejected';
+  iban: string;
+  reference: string;
+  created_at: string;
+}
+
+export interface Contract {
+  id: number;
+  user_id: number;
+  masterpiece_id: number | null;
+  type: 'purchase' | 'deposit' | 'invoice' | 'vip' | 'resale' | 'certificate';
+  doc_ref: string;
+  content: string;
+  signed_at: string | null;
+  status: 'draft' | 'signed' | 'archived';
+  version: number;
+  parent_id: number | null;
+  metadata?: string; // JSON string
+  created_at: string;
+}
+
+export interface EscrowTransaction {
+  id: number;
+  masterpiece_id: number;
+  buyer_id: number;
+  seller_id: number;
+  amount: number;
+  status: 'HELD' | 'RELEASED' | 'DISPUTED' | 'REFUNDED';
+  dispute_window_ends: string;
+  milestones: string; // JSON string
+  created_at: string;
+}
+
+export interface Certificate {
+  id: number;
+  masterpiece_id: number;
+  owner_id: number;
+  cert_id: string;
+  qr_code: string;
+  signature: string;
+  blockchain_hash: string;
+  created_at: string;
+}
+
+export interface Bid {
+  id: number;
+  auction_id: number;
+  user_id: number;
+  bidder_name: string;
+  amount: number;
+  created_at: string;
+}
+
+export interface Notification {
+  id: number;
+  user_id: number;
+  message: string;
+  type: 'info' | 'success' | 'warning';
+  is_read: number;
+  created_at: string;
+}
+
+export interface PurchaseWorkflow {
+  id: number;
+  masterpiece_id: number;
+  user_id: number;
+  status: string;
+  approved_at: string | null;
+  approved_by: number | null;
+  deposit_received_at: string | null;
+  production_started_at: string | null;
+  production_finished_at: string | null;
+  ready_for_delivery_at: string | null;
+  final_payment_pending_at: string | null;
+  completed_at: string | null;
+  created_at: string;
+}
+
+export interface ProductionProgress {
+  id: number;
+  masterpiece_id: number;
+  step_name: string;
+  status: 'pending' | 'completed';
+  timestamp: string | null;
+  notes: string | null;
+  media_url: string | null;
+  staff_id: number | null;
+  sequence_index: number;
+}
+
+export interface ProvenanceEvent {
+  id: number;
+  masterpiece_id: number;
+  event_type: 'creation' | 'exhibition' | 'service' | 'ownership_transfer' | 'auction' | 'certificate' | 'vip_event';
+  description: string;
+  event_date: string;
+  metadata?: string;
+  created_at: string;
+}
+
+export interface ServiceRecord {
+  id: number;
+  masterpiece_id: number;
+  service_type: 'repair' | 'cleaning' | 'restoration' | 'stone_replacement' | 'other';
+  description: string;
+  cost: number;
+  service_date: string;
+  provider: string;
+  created_at: string;
+}
+
+export interface WaitlistEntry {
+  id: number;
+  masterpiece_id: number | null;
+  user_id: number;
+  request_type: 'waitlist' | 'commission';
+  status: 'pending' | 'notified' | 'converted' | 'cancelled';
+  created_at: string;
+}
+
+export interface Reservation {
+  id: number;
+  masterpiece_id: number;
+  user_id: number;
+  expires_at: string;
+  type: 'vip' | 'client';
+  status: 'active' | 'expired' | 'converted';
+  created_at: string;
+}
+
+export interface CollectorProfile {
+  id: number;
+  user_id: number;
+  bio: string;
+  visibility: 'public' | 'private';
+  metadata?: string;
+  created_at: string;
+}
+
+export interface ConciergeRequest {
+  id: number;
+  user_id: number;
+  masterpiece_id?: number;
+  request_type: 'cleaning' | 'repair' | 'restoration' | 'resizing' | 'valuation_update' | 'secure_transport' | 'private_showing' | 'insurance_assistance';
+  message: string;
+  status: 'requested' | 'scheduled' | 'in_service' | 'completed' | 'cancelled';
+  assigned_admin_id?: number;
+  priority: 'standard' | 'vip';
+  created_at: string;
+}
+
+export interface ConciergeMessage {
+  id: number;
+  request_id: number;
+  sender_id: number;
+  message: string;
+  created_at: string;
+}
+
+export interface FractionalShare {
+  id: number;
+  masterpiece_id: number;
+  owner_id: number;
+  percentage: number;
+  created_at: string;
+}
+
+export interface FractionalTransfer {
+  id: number;
+  masterpiece_id: number;
+  from_owner_id: number;
+  to_owner_id: number;
+  percentage: number;
+  price: number;
+  created_at: string;
+}
+
+export interface RevenueRecord {
+  id: number;
+  type: 'resale_fee' | 'concierge_fee' | 'membership' | 'auction_commission' | 'fractional_fee' | 'subscription' | 'referral';
+  amount: number;
+  user_id: number;
+  masterpiece_id?: number;
+  reference_id?: string;
+  created_at: string;
+}
+
+export interface InvestorAnalytics {
+  platform_valuation: number;
+  pieces_sold: number;
+  appreciation_metrics: {
+    avg_appreciation: number;
+    top_performing_category: string;
+  };
+  auction_performance: {
+    total_bids: number;
+    avg_bid_increase: number;
+  };
+  rarity_distribution: Record<string, number>;
+  liquidity_forecast: number;
+  scarcity_index: number;
+}
+
+export interface InvestorRequest {
+  id: number;
+  user_id: number;
+  type: 'allocation' | 'meeting' | 'preview' | 'dataroom';
+  message: string;
+  status: 'pending' | 'approved' | 'rejected';
+  created_at: string;
+}
+
+export interface InvestorViewLog {
+  id: number;
+  user_id: number;
+  masterpiece_id: number;
+  interest_level: number;
+  created_at: string;
+}
